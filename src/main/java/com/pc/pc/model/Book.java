@@ -1,18 +1,9 @@
 package com.pc.pc.model;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "books")
@@ -44,7 +35,7 @@ public class Book {
     private User seller;
 
     @OneToMany(mappedBy = "book")
-    private List<Order> orders = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     public Book() {
     }
@@ -77,11 +68,11 @@ public class Book {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
+    public java.math.BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(java.math.BigDecimal price) {
         this.price = price;
     }
 
@@ -109,11 +100,11 @@ public class Book {
         this.seller = seller;
     }
 
-    public List<Order> getOrders() {
-        return orders;
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
     }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }
