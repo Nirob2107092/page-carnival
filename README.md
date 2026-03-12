@@ -122,3 +122,35 @@ Relationships:
 - One seller can manage many books
 - One buyer can place many orders
 - One book can be included in many orders
+
+## Database Schema
+
+The project currently includes the following core tables:
+
+- roles
+- users
+- books
+- orders
+- orderitems
+
+These tables are generated using JPA/Hibernate and PostgreSQL.
+
+## Current Progress
+
+### Completed
+
+- Spring Boot project initialization
+- layered package architecture
+- ER diagram
+- architecture diagram
+- PostgreSQL configuration
+- core entity implementation
+- JPA repositories
+- role seeding
+
+### Upcoming
+
+- Spring Security setup
+- user registration
+- login system
+- role-based authorization
