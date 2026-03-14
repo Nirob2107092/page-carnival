@@ -147,10 +147,16 @@ These tables are generated using JPA/Hibernate and PostgreSQL.
 - core entity implementation
 - JPA repositories
 - role seeding
-
-### Upcoming
-
 - Spring Security setup
 - user registration
 - login system
 - role-based authorization
+
+### Upcoming
+
+- book CRUD implementation
+- seller book management
+- buyer order flow
+- testing
+- Dockerization
+- CI/CD
