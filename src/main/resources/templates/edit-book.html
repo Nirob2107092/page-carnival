@@ -1,0 +1,11 @@
+<h2>Edit Book</h2>
+
+<form th:action="@{/seller/books/edit/{id}(id=${book.id})}" method="post" th:object="${book}">
+<input type="text" th:field="*{title}"/>
+<input type="text" th:field="*{author}"/>
+<input type="text" th:field="*{description}"/>
+<input type="number" th:field="*{price}"/>
+<input type="number" th:field="*{stock}"/>
+<input type="text" th:field="*{category}"/>
+<button type="submit">Update</button>
+</form>

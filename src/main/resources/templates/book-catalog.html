@@ -1,0 +1,16 @@
+<h2>Book Catalog</h2>
+
+<table>
+<tr>
+<th>Title</th>
+<th>Author</th>
+<th>Price</th>
+</tr>
+
+<tr th:each="book : ${books}">
+<td th:text="${book.title}"></td>
+<td th:text="${book.author}"></td>
+<td th:text="${book.price}"></td>
+</tr>
+
+</table>
