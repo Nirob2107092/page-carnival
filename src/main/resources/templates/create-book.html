@@ -1,0 +1,11 @@
+<h2>Create Book</h2>
+
+<form action="/seller/books/create" method="post" th:object="${book}">
+<input type="text" th:field="*{title}" placeholder="Title"/>
+<input type="text" th:field="*{author}" placeholder="Author"/>
+<input type="text" th:field="*{description}" placeholder="Description"/>
+<input type="number" th:field="*{price}" placeholder="Price"/>
+<input type="number" th:field="*{stock}" placeholder="Stock"/>
+<input type="text" th:field="*{category}" placeholder="Category"/>
+<button type="submit">Save</button>
+</form>
