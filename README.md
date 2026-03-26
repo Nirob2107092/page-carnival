@@ -137,6 +137,8 @@ These tables are generated using JPA/Hibernate and PostgreSQL.
 
 ## Current Progress
 
+## Current Progress
+
 ### Completed
 
 - Spring Boot project initialization
@@ -151,12 +153,17 @@ These tables are generated using JPA/Hibernate and PostgreSQL.
 - user registration
 - login system
 - role-based authorization
+- book catalog view
+- buyer cart functionality (add/update/remove items)
+- order placement (checkout flow)
+- buyer order history
+- controller + service + DTO integration for order flow
 
 ### Upcoming
 
 - book CRUD implementation
 - seller book management
-- buyer order flow
+- input validation & error handling improvements
 - testing
 - Dockerization
 - CI/CD
