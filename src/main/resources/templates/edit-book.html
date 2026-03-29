@@ -1,11 +1,71 @@
-<h2>Edit Book</h2>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Book – Page Carnival</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 560px; margin: 40px auto; padding: 0 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+        nav span { font-weight: bold; font-size: 1.1em; color: #333; }
+        .nav-links a { margin-left: 16px; color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        h2 { color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; color: #555; }
+        input, textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95em; }
+        textarea { resize: vertical; height: 80px; }
+        .btn-row { display: flex; gap: 12px; margin-top: 20px; }
+        .btn { display: inline-block; padding: 10px 24px; background: #4a90d9; color: white; text-decoration: none; border: none; border-radius: 4px; font-size: 1em; cursor: pointer; }
+        .btn:hover { background: #357abd; }
+        .btn-secondary { background: #888; }
+        .btn-secondary:hover { background: #666; }
+        .logout-form { display: inline; }
+        .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; padding: 0; }
+        .logout-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Page Carnival — Seller</span>
+        <div class="nav-links">
+            <a th:href="@{/seller/dashboard}">Dashboard</a>
+            <a th:href="@{/seller/books}">My Books</a>
+            <form class="logout-form" th:action="@{/logout}" method="post">
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
 
-<form th:action="@{/seller/books/edit/{id}(id=${book.id})}" method="post" th:object="${book}">
-<input type="text" th:field="*{title}"/>
-<input type="text" th:field="*{author}"/>
-<input type="text" th:field="*{description}"/>
-<input type="number" th:field="*{price}"/>
-<input type="number" th:field="*{stock}"/>
-<input type="text" th:field="*{category}"/>
-<button type="submit">Update</button>
-</form>
+    <h2>Edit Book</h2>
+
+    <form th:action="@{/seller/books/edit/{id}(id=${book.id})}" method="post" th:object="${book}">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" th:field="*{title}" required />
+        </div>
+        <div class="form-group">
+            <label for="author">Author</label>
+            <input type="text" id="author" th:field="*{author}" required />
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" th:field="*{description}"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" id="category" th:field="*{category}" required />
+        </div>
+        <div class="form-group">
+            <label for="price">Price ($)</label>
+            <input type="number" id="price" th:field="*{price}" step="0.01" min="0.01" required />
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <input type="number" id="stock" th:field="*{stock}" min="0" required />
+        </div>
+        <div class="btn-row">
+            <button class="btn" type="submit">Update Book</button>
+            <a class="btn btn-secondary" th:href="@{/seller/books}">Cancel</a>
+        </div>
+    </form>
+</body>
+</html>
