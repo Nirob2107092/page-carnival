@@ -1,14 +1,44 @@
 <!DOCTYPE html>
-<html>
-
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard – Page Carnival</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+        nav span { font-weight: bold; font-size: 1.1em; color: #333; }
+        .nav-links a { margin-left: 16px; color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        h2 { color: #333; }
+        .card-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 24px; }
+        .card { flex: 1; min-width: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 24px; text-align: center; }
+        .card h3 { margin: 0 0 10px; color: #333; }
+        .card p { color: #777; margin: 0 0 16px; }
+        .btn { display: inline-block; padding: 8px 20px; background: #4a90d9; color: white; text-decoration: none; border-radius: 4px; }
+        .btn:hover { background: #357abd; }
+        .logout-form { display: inline; }
+        .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; padding: 0; }
+        .logout-btn:hover { text-decoration: underline; }
+    </style>
 </head>
-
 <body>
-    <h2>Admin Dashboard</h2>
-    <p>Accessible only to ADMIN users.</p>
-    <a href="/logout">Logout</a>
-</body>
+    <nav>
+        <span>Page Carnival — Admin</span>
+        <div class="nav-links">
+            <form class="logout-form" th:action="@{/logout}" method="post">
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
 
+    <h2>Admin Dashboard</h2>
+    <p>Welcome! You have full administrative access.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>Book Catalog</h3>
+            <p>View all books listed on the platform.</p>
+            <a class="btn" th:href="@{/buyer/catalog}">View Catalog</a>
+        </div>
+    </div>
+</body>
 </html>
