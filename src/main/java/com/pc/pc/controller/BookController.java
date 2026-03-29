@@ -1,8 +1,10 @@
 package com.pc.pc.controller;
 
 import com.pc.pc.dto.BookDto;
+import com.pc.pc.security.CustomUserDetails;
 import com.pc.pc.service.BookService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +32,9 @@ public class BookController {
     }
 
     @PostMapping("/create")
-    public String createBook(@Valid @ModelAttribute("book") BookDto bookDto) {
-        bookService.createBook(bookDto);
+    public String createBook(@Valid @ModelAttribute("book") BookDto bookDto,
+                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        bookService.createBook(bookDto, userDetails.getUser());
         return "redirect:/seller/books";
     }
 
