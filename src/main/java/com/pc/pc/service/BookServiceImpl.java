@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.pc.pc.dto.BookDto;
 import com.pc.pc.model.Book;
+import com.pc.pc.model.User;
 import com.pc.pc.repository.BookRepository;
 
 @Service
@@ -42,8 +43,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto createBook(BookDto bookDto) {
+    public BookDto createBook(BookDto bookDto, User seller) {
         Book book = mapToEntity(bookDto);
+        book.setSeller(seller);
         Book saved = bookRepository.save(book);
         return mapToDto(saved);
     }

@@ -2,7 +2,10 @@ package com.pc.pc.service;
 
 import java.math.BigDecimal;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.pc.pc.dto.CartDto;
 import com.pc.pc.dto.CartItemDto;
@@ -10,6 +13,7 @@ import com.pc.pc.model.Book;
 import com.pc.pc.repository.BookRepository;
 
 @Service
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CartServiceImpl implements CartService {
 
     private final BookRepository bookRepository;
