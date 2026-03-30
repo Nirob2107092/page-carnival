@@ -2,12 +2,14 @@ package com.pc.pc.controller;
 
 import com.pc.pc.security.CustomUserDetails;
 import com.pc.pc.service.OrderService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@PreAuthorize("hasRole('BUYER')")
 @RequestMapping("/buyer/orders")
 public class OrderController {
 

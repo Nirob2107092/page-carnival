@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import com.pc.pc.dto.CartDto;
 import com.pc.pc.dto.OrderHistoryDto;
 import com.pc.pc.dto.OrderItemDto;
+import com.pc.pc.exception.EmptyCartException;
+import com.pc.pc.exception.InsufficientStockException;
+import com.pc.pc.exception.ResourceNotFoundException;
 import com.pc.pc.model.Book;
 import com.pc.pc.model.Order;
 import com.pc.pc.model.OrderItem;
@@ -38,11 +41,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void placeOrder(Long buyerId) {
-        User buyer = userRepository.findById(buyerId).orElseThrow();
+        User buyer = userRepository.findById(buyerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", buyerId));
         CartDto cart = cartService.getCart();
 
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new EmptyCartException();
         }
 
         Order order = new Order();
@@ -52,10 +56,11 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(cart.getTotal());
 
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
-            Book book = bookRepository.findById(cartItem.getBookId()).orElseThrow();
+            Book book = bookRepository.findById(cartItem.getBookId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Book", cartItem.getBookId()));
 
             if (book.getStock() < cartItem.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for book: " + book.getTitle());
+                throw new InsufficientStockException(book.getTitle());
             }
 
             book.setStock(book.getStock() - cartItem.getQuantity());
@@ -78,7 +83,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderHistoryDto> getOrdersByBuyer(Long buyerId) {
-        User buyer = userRepository.findById(buyerId).orElseThrow();
+        User buyer = userRepository.findById(buyerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", buyerId));
 
         return orderRepository.findByBuyer(buyer).stream().map(order -> {
             OrderHistoryDto dto = new OrderHistoryDto();

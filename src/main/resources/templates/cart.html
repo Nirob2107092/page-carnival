@@ -65,6 +65,7 @@
                     <td th:text="'$' + ${item.price}"></td>
                     <td>
                         <form th:action="@{/buyer/cart/update}" method="post" class="update-form">
+                            <input type="hidden" name="_method" value="PATCH" />
                             <input type="hidden" name="bookId" th:value="${item.bookId}" />
                             <input class="qty-input" type="number" name="quantity" th:value="${item.quantity}" min="1" />
                             <button class="btn" type="submit">Update</button>
@@ -72,8 +73,12 @@
                     </td>
                     <td th:text="'$' + ${item.subtotal}"></td>
                     <td>
-                        <a class="btn btn-danger" th:href="@{/buyer/cart/remove/{id}(id=${item.bookId})}"
-                           onclick="return confirm('Remove this item?')">Remove</a>
+                        <form th:action="@{/buyer/cart/remove/{id}(id=${item.bookId})}" method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Remove this item?')">
+                            <input type="hidden" name="_method" value="DELETE" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
                     </td>
                 </tr>
             </tbody>
@@ -87,8 +92,11 @@
         <div class="bottom-links">
             <a class="btn" th:href="@{/buyer/catalog}">Continue Shopping</a>
             <div style="display:flex; gap:10px;">
-                <a class="btn btn-danger" th:href="@{/buyer/cart/clear}"
-                   onclick="return confirm('Clear entire cart?')">Clear Cart</a>
+                <form th:action="@{/buyer/cart/clear}" method="post"
+                      onsubmit="return confirm('Clear entire cart?')">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit" class="btn btn-danger">Clear Cart</button>
+                </form>
                 <form th:action="@{/buyer/orders/place}" method="post">
                     <button class="btn btn-success" type="submit">Place Order</button>
                 </form>
