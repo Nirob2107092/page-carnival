@@ -66,8 +66,12 @@
                 <td th:text="${book.stock}"></td>
                 <td>
                     <a class="btn btn-sm" th:href="@{/seller/books/edit/{id}(id=${book.id})}">Edit</a>
-                    <a class="btn btn-sm btn-danger" th:href="@{/seller/books/delete/{id}(id=${book.id})}"
-                       onclick="return confirm('Delete this book?')">Delete</a>
+                    <form th:action="@{/seller/books/delete/{id}(id=${book.id})}" method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Delete this book?')">
+                        <input type="hidden" name="_method" value="DELETE" />
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
                 </td>
             </tr>
         </tbody>

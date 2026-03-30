@@ -4,12 +4,14 @@ import com.pc.pc.dto.BookDto;
 import com.pc.pc.security.CustomUserDetails;
 import com.pc.pc.service.BookService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@PreAuthorize("hasRole('SELLER')")
 @RequestMapping("/seller/books")
 public class BookController {
 
@@ -44,14 +46,14 @@ public class BookController {
         return "edit-book";
     }
 
-    @PostMapping("/edit/{id}")
+    @PutMapping("/edit/{id}")
     public String updateBook(@PathVariable Long id,
                              @Valid @ModelAttribute("book") BookDto bookDto) {
         bookService.updateBook(id, bookDto);
         return "redirect:/seller/books";
     }
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return "redirect:/seller/books";

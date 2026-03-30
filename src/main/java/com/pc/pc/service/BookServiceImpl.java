@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.pc.pc.dto.BookDto;
+import com.pc.pc.exception.ResourceNotFoundException;
 import com.pc.pc.model.Book;
 import com.pc.pc.model.User;
 import com.pc.pc.repository.BookRepository;
@@ -60,12 +61,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getBookById(Long id) {
-        return mapToDto(bookRepository.findById(id).orElseThrow());
+        return mapToDto(bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", id)));
     }
 
     @Override
     public BookDto updateBook(Long id, BookDto dto) {
-        Book book = bookRepository.findById(id).orElseThrow();
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", id));
 
         book.setTitle(dto.getTitle());
         book.setAuthor(dto.getAuthor());

@@ -1,11 +1,13 @@
 package com.pc.pc.controller;
 
 import com.pc.pc.service.CartService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@PreAuthorize("hasRole('BUYER')")
 @RequestMapping("/buyer/cart")
 public class CartController {
 
@@ -28,20 +30,20 @@ public class CartController {
         return "redirect:/buyer/cart";
     }
 
-    @PostMapping("/update")
+    @PatchMapping("/update")
     public String updateCart(@RequestParam Long bookId,
                              @RequestParam Integer quantity) {
         cartService.updateQuantity(bookId, quantity);
         return "redirect:/buyer/cart";
     }
 
-    @GetMapping("/remove/{bookId}")
+    @DeleteMapping("/remove/{bookId}")
     public String removeFromCart(@PathVariable Long bookId) {
         cartService.removeFromCart(bookId);
         return "redirect:/buyer/cart";
     }
 
-    @GetMapping("/clear")
+    @DeleteMapping("/clear")
     public String clearCart() {
         cartService.clearCart();
         return "redirect:/buyer/cart";
