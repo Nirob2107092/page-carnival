@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.pc.pc.dto.CartDto;
 import com.pc.pc.dto.OrderHistoryDto;
 import com.pc.pc.dto.OrderItemDto;
+import com.pc.pc.dto.OrderUpdateStatusDto;
 import com.pc.pc.exception.EmptyCartException;
 import com.pc.pc.exception.InsufficientStockException;
 import com.pc.pc.exception.ResourceNotFoundException;
@@ -41,8 +42,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void placeOrder(Long buyerId) {
-        User buyer = userRepository.findById(buyerId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", buyerId));
+        User buyer = getBuyerById(buyerId);
         CartDto cart = cartService.getCart();
 
         if (cart.getItems().isEmpty()) {
@@ -77,33 +77,64 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderItems(orderItems);
         orderRepository.save(order);
-
         cartService.clearCart();
     }
 
     @Override
     public List<OrderHistoryDto> getOrdersByBuyer(Long buyerId) {
-        User buyer = userRepository.findById(buyerId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", buyerId));
+        User buyer = getBuyerById(buyerId);
+        return orderRepository.findByBuyer(buyer).stream()
+                .map(this::mapToHistoryDto)
+                .collect(Collectors.toList());
+    }
 
-        return orderRepository.findByBuyer(buyer).stream().map(order -> {
-            OrderHistoryDto dto = new OrderHistoryDto();
-            dto.setOrderId(order.getId());
-            dto.setOrderDate(order.getOrderDate());
-            dto.setStatus(order.getStatus().name());
-            dto.setTotalPrice(order.getTotalPrice());
+    @Override
+    public OrderHistoryDto getOrderById(Long buyerId, Long orderId) {
+        User buyer = getBuyerById(buyerId);
+        Order order = orderRepository.findByIdAndBuyer(orderId, buyer)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+        return mapToHistoryDto(order);
+    }
 
-            List<OrderItemDto> items = order.getOrderItems().stream().map(item -> {
-                OrderItemDto itemDto = new OrderItemDto();
-                itemDto.setBookTitle(item.getBook().getTitle());
-                itemDto.setQuantity(item.getQuantity());
-                itemDto.setUnitPrice(item.getUnitPrice());
-                itemDto.setSubtotal(item.getSubtotal());
-                return itemDto;
-            }).collect(Collectors.toList());
+    @Override
+    public OrderHistoryDto updateOrderStatus(Long buyerId, Long orderId, OrderUpdateStatusDto request) {
+        User buyer = getBuyerById(buyerId);
+        Order order = orderRepository.findByIdAndBuyer(orderId, buyer)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+        order.setStatus(request.getStatus());
+        return mapToHistoryDto(orderRepository.save(order));
+    }
 
-            dto.setItems(items);
-            return dto;
+    @Override
+    public void deleteOrder(Long buyerId, Long orderId) {
+        User buyer = getBuyerById(buyerId);
+        Order order = orderRepository.findByIdAndBuyer(orderId, buyer)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+        orderRepository.delete(order);
+    }
+
+    private OrderHistoryDto mapToHistoryDto(Order order) {
+        OrderHistoryDto dto = new OrderHistoryDto();
+        dto.setOrderId(order.getId());
+        dto.setOrderDate(order.getOrderDate());
+        dto.setStatus(order.getStatus().name());
+        dto.setTotalPrice(order.getTotalPrice());
+
+        List<OrderItemDto> items = order.getOrderItems().stream().map(item -> {
+            OrderItemDto itemDto = new OrderItemDto();
+            itemDto.setBookTitle(item.getBook().getTitle());
+            itemDto.setQuantity(item.getQuantity());
+            itemDto.setUnitPrice(item.getUnitPrice());
+            itemDto.setSubtotal(item.getSubtotal());
+            return itemDto;
         }).collect(Collectors.toList());
+
+        dto.setItems(items);
+        return dto;
+    }
+
+    private User getBuyerById(Long buyerId) {
+        return userRepository.findById(buyerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", buyerId));
     }
 }
