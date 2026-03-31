@@ -42,6 +42,17 @@ public class GlobalExceptionHandler {
         return "error";
     }
 
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleDuplicateEmail(DuplicateEmailException ex, Model model) {
+        model.addAttribute("statusCode", 409);
+        model.addAttribute("errorTitle", "Registration Failed");
+        model.addAttribute("errorMessage", ex.getMessage());
+        model.addAttribute("backLink", "/register");
+        model.addAttribute("backText", "Back to Register");
+        return "error";
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleGenericException(Exception ex, Model model) {

@@ -9,6 +9,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.pc.pc.dto.CartDto;
 import com.pc.pc.dto.CartItemDto;
+import com.pc.pc.exception.ResourceNotFoundException;
 import com.pc.pc.model.Book;
 import com.pc.pc.repository.BookRepository;
 
@@ -31,7 +32,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void addToCart(Long bookId, Integer quantity) {
-        Book book = bookRepository.findById(bookId).orElseThrow();
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", bookId));
 
         CartItemDto existing = cart.getItems().stream()
                 .filter(item -> item.getBookId().equals(bookId))
