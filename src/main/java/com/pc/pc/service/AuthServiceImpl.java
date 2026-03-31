@@ -4,6 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pc.pc.dto.UserRegistrationDto;
+import com.pc.pc.exception.DuplicateEmailException;
+import com.pc.pc.exception.ResourceNotFoundException;
 import com.pc.pc.model.Role;
 import com.pc.pc.model.User;
 import com.pc.pc.repository.RoleRepository;
@@ -27,11 +29,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void registerUser(UserRegistrationDto registrationDto) {
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
-            throw new RuntimeException("Email is already registered");
+            throw new DuplicateEmailException(registrationDto.getEmail());
         }
 
         Role role = roleRepository.findByName(registrationDto.getRole())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", null));
 
         User user = new User();
         user.setFullName(registrationDto.getFullName());
