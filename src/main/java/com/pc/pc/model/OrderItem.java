@@ -3,6 +3,14 @@ package com.pc.pc.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+/**
+ * Join entity that implements the many-to-many relationship between
+ * {@link Order} and {@link Book}.
+ * <p>
+ * An explicit join entity is used instead of {@code @ManyToMany} because
+ * each association carries additional attributes: quantity, unit price,
+ * and subtotal.
+ */
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
