@@ -1,39 +1,49 @@
 package com.pc.pc.controller;
 
-import com.pc.pc.dto.UserRegistrationDto;
 import com.pc.pc.model.RoleType;
-import com.pc.pc.service.AuthService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 class AuthControllerIntegrationTest {
 
-    @Mock
-    private AuthService authService;
-
-    @InjectMocks
-    private AuthController authController;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     void registerUserShouldRedirectToLogin() throws Exception {
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
-
         mockMvc.perform(post("/register")
                         .param("fullName", "Alice")
                         .param("email", "alice@example.com")
                         .param("password", "pass123")
-                        .param("role", RoleType.BUYER.name()))
+                        .param("role", RoleType.BUYER.name())
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login?registered"));
+                .andExpect(redirectedUrl("/login?registered"));
+    }
+
+    @Test
+    void registerPageShouldBeAccessibleWithoutAuth() throws Exception {
+        mockMvc.perform(get("/register"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("register"));
+    }
+
+    @Test
+    void loginPageShouldBeAccessibleWithoutAuth() throws Exception {
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"));
     }
 }
