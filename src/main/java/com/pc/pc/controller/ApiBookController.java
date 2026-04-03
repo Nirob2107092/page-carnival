@@ -24,7 +24,7 @@ public class ApiBookController {
 
     @GetMapping
     public ResponseEntity<List<BookDto>> getAllBooks() {
-        return ResponseEntity.ok(bookService.getAllBooks());
+        return ResponseEntity.ok(bookService.getBuyerVisibleBooks());
     }
 
     @GetMapping("/{id}")
@@ -43,14 +43,16 @@ public class ApiBookController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<BookDto> updateBook(@PathVariable Long id,
-                                              @Valid @RequestBody BookDto bookDto) {
-        return ResponseEntity.ok(bookService.updateBook(id, bookDto));
+                                              @Valid @RequestBody BookDto bookDto,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(bookService.updateBookForSeller(id, bookDto, userDetails.getUser()));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
-        bookService.deleteBook(id);
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        bookService.deleteBookForSeller(id, userDetails.getUser());
         return ResponseEntity.noContent().build();
     }
 }

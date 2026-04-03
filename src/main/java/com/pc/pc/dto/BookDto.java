@@ -33,6 +33,8 @@ public class BookDto {
     @NotBlank(message = "Category is required")
     private String category;
 
+    private String sellerName;
+
     public Long getId() {
         return id;
     }
@@ -89,5 +91,11 @@ public class BookDto {
         this.category = category;
     }
 
-    // getters & setters
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
+    }
 }

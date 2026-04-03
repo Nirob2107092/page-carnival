@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Catalog – Page Carnival Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+        nav span { font-weight: bold; font-size: 1.1em; color: #333; }
+        .nav-links a { margin-left: 16px; color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        h2 { color: #333; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f4f4f4; padding: 10px 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+        .empty-msg { color: #888; text-align: center; padding: 30px 0; }
+        .logout-form { display: inline; }
+        .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; padding: 0; }
+        .logout-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Page Carnival — Admin</span>
+        <div class="nav-links">
+            <a th:href="@{/admin/dashboard}">Dashboard</a>
+            <form class="logout-form" th:action="@{/logout}" method="post">
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <h2>Book Catalog</h2>
+
+    <div th:if="${#lists.isEmpty(books)}" class="empty-msg">
+        <p>No books are listed on the platform yet.</p>
+    </div>
+
+    <table th:if="${!#lists.isEmpty(books)}">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Seller</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.author}"></td>
+                <td th:text="${book.category}"></td>
+                <td th:text="'$' + ${book.price}"></td>
+                <td th:text="${book.stock}"></td>
+                <td th:text="${book.sellerName}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

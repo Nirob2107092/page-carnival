@@ -7,6 +7,7 @@ import com.pc.pc.dto.UserRegistrationDto;
 import com.pc.pc.exception.DuplicateEmailException;
 import com.pc.pc.exception.ResourceNotFoundException;
 import com.pc.pc.model.Role;
+import com.pc.pc.model.RoleType;
 import com.pc.pc.model.User;
 import com.pc.pc.repository.RoleRepository;
 import com.pc.pc.repository.UserRepository;
@@ -28,6 +29,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void registerUser(UserRegistrationDto registrationDto) {
+        if (registrationDto.getRole() == RoleType.ADMIN) {
+            throw new IllegalArgumentException("Admin registration is not allowed");
+        }
+
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
             throw new DuplicateEmailException(registrationDto.getEmail());
         }

@@ -29,6 +29,9 @@ public class BookServiceImpl implements BookService {
         dto.setPrice(book.getPrice());
         dto.setStock(book.getStock());
         dto.setCategory(book.getCategory());
+        if (book.getSeller() != null) {
+            dto.setSellerName(book.getSeller().getFullName());
+        }
         return dto;
     }
 
@@ -60,9 +63,30 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<BookDto> getBuyerVisibleBooks() {
+        return bookRepository.findBySeller_EnabledTrue()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookDto> getBooksBySeller(User seller) {
+        return bookRepository.findBySeller(seller)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public BookDto getBookById(Long id) {
         return mapToDto(bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", id)));
+    }
+
+    @Override
+    public BookDto getBookByIdForSeller(Long id, User seller) {
+        return mapToDto(getOwnedBook(id, seller));
     }
 
     @Override
@@ -81,10 +105,35 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public BookDto updateBookForSeller(Long id, BookDto dto, User seller) {
+        Book book = getOwnedBook(id, seller);
+
+        book.setTitle(dto.getTitle());
+        book.setAuthor(dto.getAuthor());
+        book.setDescription(dto.getDescription());
+        book.setPrice(dto.getPrice());
+        book.setStock(dto.getStock());
+        book.setCategory(dto.getCategory());
+
+        return mapToDto(bookRepository.save(book));
+    }
+
+    @Override
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
             throw new ResourceNotFoundException("Book", id);
         }
         bookRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteBookForSeller(Long id, User seller) {
+        Book book = getOwnedBook(id, seller);
+        bookRepository.delete(book);
+    }
+
+    private Book getOwnedBook(Long id, User seller) {
+        return bookRepository.findByIdAndSeller(id, seller)
+                .orElseThrow(() -> new ResourceNotFoundException("Book", id));
     }
 }

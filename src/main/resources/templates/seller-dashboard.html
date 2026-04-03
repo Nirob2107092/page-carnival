@@ -25,6 +25,7 @@
         <span>Page Carnival — Seller</span>
         <div class="nav-links">
             <a th:href="@{/seller/books}">My Books</a>
+            <a th:href="@{/seller/orders}">Orders</a>
             <a th:href="@{/seller/books/create}">Add Book</a>
             <form class="logout-form" th:action="@{/logout}" method="post">
                 <button class="logout-btn" type="submit">Logout</button>
@@ -45,6 +46,11 @@
             <h3>Add New Book</h3>
             <p>List a new book for sale on the platform.</p>
             <a class="btn" th:href="@{/seller/books/create}">Add Book</a>
+        </div>
+        <div class="card">
+            <h3>Incoming Orders</h3>
+            <p>Review and respond to buyer orders for your books.</p>
+            <a class="btn" th:href="@{/seller/orders}">View Orders</a>
         </div>
     </div>
 </body>

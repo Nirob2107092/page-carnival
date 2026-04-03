@@ -10,6 +10,7 @@ import com.pc.pc.dto.CartDto;
 import com.pc.pc.dto.OrderHistoryDto;
 import com.pc.pc.dto.OrderItemDto;
 import com.pc.pc.dto.OrderUpdateStatusDto;
+import com.pc.pc.dto.SellerOrderItemDto;
 import com.pc.pc.exception.EmptyCartException;
 import com.pc.pc.exception.InsufficientStockException;
 import com.pc.pc.exception.ResourceNotFoundException;
@@ -19,6 +20,7 @@ import com.pc.pc.model.OrderItem;
 import com.pc.pc.model.OrderStatus;
 import com.pc.pc.model.User;
 import com.pc.pc.repository.BookRepository;
+import com.pc.pc.repository.OrderItemRepository;
 import com.pc.pc.repository.OrderRepository;
 import com.pc.pc.repository.UserRepository;
 
@@ -28,15 +30,18 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
 
     public OrderServiceImpl(UserRepository userRepository,
                             BookRepository bookRepository,
                             OrderRepository orderRepository,
+                            OrderItemRepository orderItemRepository,
                             CartService cartService) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
         this.cartService = cartService;
     }
 
@@ -131,6 +136,45 @@ public class OrderServiceImpl implements OrderService {
 
         dto.setItems(items);
         return dto;
+    }
+
+    @Override
+    public List<SellerOrderItemDto> getOrderItemsForSeller(Long sellerId) {
+        User seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", sellerId));
+
+        return orderItemRepository.findByBook_Seller(seller).stream().map(item -> {
+            SellerOrderItemDto dto = new SellerOrderItemDto();
+            dto.setOrderId(item.getOrder().getId());
+            dto.setOrderDate(item.getOrder().getOrderDate());
+            dto.setBuyerName(item.getOrder().getBuyer().getFullName());
+            dto.setBuyerEmail(item.getOrder().getBuyer().getEmail());
+            dto.setBookTitle(item.getBook().getTitle());
+            dto.setQuantity(item.getQuantity());
+            dto.setSubtotal(item.getSubtotal());
+            dto.setStatus(item.getOrder().getStatus().name());
+            dto.setOrderItemId(item.getId());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateOrderStatusBySeller(Long orderId, Long sellerId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+        boolean sellerOwnsItem = order.getOrderItems().stream()
+                .anyMatch(item -> item.getBook().getSeller().getId().equals(sellerId));
+        if (!sellerOwnsItem) {
+            throw new ResourceNotFoundException("Order", orderId);
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("Only PENDING orders can be updated");
+        }
+
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 
     private User getBuyerById(Long buyerId) {
