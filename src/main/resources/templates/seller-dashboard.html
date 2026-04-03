@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Seller Dashboard – Page Carnival</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+        nav span { font-weight: bold; font-size: 1.1em; color: #333; }
+        .nav-links a { margin-left: 16px; color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        h2 { color: #333; }
+        .card-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 24px; }
+        .card { flex: 1; min-width: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 24px; text-align: center; }
+        .card h3 { margin: 0 0 10px; color: #333; }
+        .card p { color: #777; margin: 0 0 16px; }
+        .btn { display: inline-block; padding: 8px 20px; background: #4a90d9; color: white; text-decoration: none; border-radius: 4px; }
+        .btn:hover { background: #357abd; }
+        .logout-form { display: inline; }
+        .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; padding: 0; }
+        .logout-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Page Carnival — Seller</span>
+        <div class="nav-links">
+            <a th:href="@{/seller/books}">My Books</a>
+            <a th:href="@{/seller/orders}">Orders</a>
+            <a th:href="@{/seller/books/create}">Add Book</a>
+            <form class="logout-form" th:action="@{/logout}" method="post">
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <h2>Seller Dashboard</h2>
+    <p>Manage your book listings from here.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3>My Books</h3>
+            <p>View, edit, and delete your listed books.</p>
+            <a class="btn" th:href="@{/seller/books}">Manage Books</a>
+        </div>
+        <div class="card">
+            <h3>Add New Book</h3>
+            <p>List a new book for sale on the platform.</p>
+            <a class="btn" th:href="@{/seller/books/create}">Add Book</a>
+        </div>
+        <div class="card">
+            <h3>Incoming Orders</h3>
+            <p>Review and respond to buyer orders for your books.</p>
+            <a class="btn" th:href="@{/seller/orders}">View Orders</a>
+        </div>
+    </div>
+</body>
+</html>

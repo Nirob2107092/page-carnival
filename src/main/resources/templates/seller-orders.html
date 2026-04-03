@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Incoming Orders – Page Carnival</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+        nav span { font-weight: bold; font-size: 1.1em; color: #333; }
+        .nav-links a { margin-left: 16px; color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        h2 { color: #333; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f4f4f4; padding: 10px 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+        .empty-msg { color: #888; text-align: center; padding: 30px 0; }
+        .status-PENDING { color: #e67e22; font-weight: bold; }
+        .status-CONFIRMED { color: #27ae60; font-weight: bold; }
+        .status-CANCELLED { color: #e74c3c; font-weight: bold; }
+        .btn { display: inline-block; padding: 5px 14px; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; text-decoration: none; }
+        .btn-accept { background: #27ae60; }
+        .btn-accept:hover { background: #1e8449; }
+        .btn-reject { background: #e74c3c; }
+        .btn-reject:hover { background: #c0392b; }
+        .action-forms { display: flex; gap: 6px; }
+        .logout-form { display: inline; }
+        .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; padding: 0; }
+        .logout-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Page Carnival — Seller</span>
+        <div class="nav-links">
+            <a th:href="@{/seller/dashboard}">Dashboard</a>
+            <a th:href="@{/seller/books}">My Books</a>
+            <a th:href="@{/seller/orders}">Orders</a>
+            <a th:href="@{/seller/books/create}">Add Book</a>
+            <form class="logout-form" th:action="@{/logout}" method="post">
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <h2>Incoming Orders</h2>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="empty-msg">
+        <p>No orders have been placed for your books yet.</p>
+    </div>
+
+    <table th:if="${!#lists.isEmpty(orders)}">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Buyer Name</th>
+                <th>Buyer Email</th>
+                <th>Book Title</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.orderId}"></td>
+                <td th:text="${order.orderDate}"></td>
+                <td th:text="${order.buyerName}"></td>
+                <td th:text="${order.buyerEmail}"></td>
+                <td th:text="${order.bookTitle}"></td>
+                <td th:text="${order.quantity}"></td>
+                <td th:text="'$' + ${order.subtotal}"></td>
+                <td>
+                    <span th:text="${order.status}"
+                          th:classappend="'status-' + ${order.status}"></span>
+                </td>
+                <td>
+                    <div th:if="${order.status == 'PENDING'}" class="action-forms">
+                        <form th:action="@{/seller/orders/{id}/accept(id=${order.orderId})}" method="post">
+                            <button type="submit" class="btn btn-accept">Accept</button>
+                        </form>
+                        <form th:action="@{/seller/orders/{id}/reject(id=${order.orderId})}" method="post">
+                            <button type="submit" class="btn btn-reject">Reject</button>
+                        </form>
+                    </div>
+                    <span th:if="${order.status != 'PENDING'}" style="color: #999;">—</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
