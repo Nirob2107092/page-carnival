@@ -48,6 +48,24 @@ Spring Security handles authentication via form login and HTTP Basic, with role-
 
 ---
 
+## Recent Updates (April 2026)
+
+- Enforced seller ownership rules:
+  - Sellers only see their own books in `/seller/books`
+  - Sellers can update/delete only books they own (MVC + REST)
+- Added admin seller management:
+  - Admin can enable/disable seller accounts from dashboard
+  - Admin dashboard now includes buyer/seller counts
+- Added buyer visibility filtering:
+  - Buyer catalog and `/api/books` now show only books from enabled sellers
+- Added seller order workflow:
+  - Seller can view incoming orders and accept/reject pending orders
+- Hardened registration flow:
+  - Public registration allows only BUYER and SELLER
+  - ADMIN self-registration is blocked in service layer
+
+---
+
 ## ER Diagram
 
 ![ER Diagram](docs/ER_diagram.png)
@@ -89,11 +107,11 @@ Spring Security handles authentication via form login and HTTP Basic, with role-
 
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
-| GET | `/api/books` | Authenticated | List all books |
+| GET | `/api/books` | Authenticated | List books from enabled sellers |
 | GET | `/api/books/{id}` | Authenticated | Get book by ID |
 | POST | `/api/books` | SELLER | Create a book |
-| PUT | `/api/books/{id}` | SELLER | Update a book |
-| DELETE | `/api/books/{id}` | SELLER | Delete a book |
+| PUT | `/api/books/{id}` | SELLER | Update own book |
+| DELETE | `/api/books/{id}` | SELLER | Delete own book |
 
 ### REST API -- Cart
 
@@ -144,9 +162,19 @@ Spring Security handles authentication via form login and HTTP Basic, with role-
 |--------|-----|------|-------------|
 | GET | `/` | None | Home page |
 | GET | `/admin/dashboard` | ADMIN | Admin dashboard |
+| GET | `/admin/catalog` | ADMIN | View full platform catalog |
+| POST | `/admin/sellers/{id}/toggle` | ADMIN | Enable/disable a seller |
 | GET | `/seller/dashboard` | SELLER | Seller dashboard |
 | GET | `/buyer/dashboard` | BUYER | Buyer dashboard |
-| GET | `/buyer/catalog` | BUYER | Book catalog |
+| GET | `/buyer/catalog` | BUYER | Buyer-visible catalog (enabled sellers only) |
+
+### MVC -- Seller Orders
+
+| Method | URL | Auth | Description |
+|--------|-----|------|-------------|
+| GET | `/seller/orders` | SELLER | View incoming orders for seller books |
+| POST | `/seller/orders/{orderId}/accept` | SELLER | Accept pending order |
+| POST | `/seller/orders/{orderId}/reject` | SELLER | Reject pending order |
 
 ---
 
@@ -202,7 +230,7 @@ Tests use an in-memory H2 database (configured in `src/test/resources/applicatio
 
 ## Testing
 
-### Unit Tests (Service Layer) -- 19 tests
+### Unit Tests (Service Layer)
 
 | Test Class | Tests | What It Covers |
 |-----------|-------|----------------|
@@ -211,7 +239,7 @@ Tests use an in-memory H2 database (configured in `src/test/resources/applicatio
 | `CartServiceImplTest` | 5 | Add/update/remove items, book-not-found |
 | `OrderServiceImplTest` | 5 | Order placement, empty cart rejection, stock validation, status updates |
 
-### Integration Tests (Controller Layer) -- 9 tests
+### Integration Tests (Controller Layer)
 
 | Test Class | Tests | What It Covers |
 |-----------|-------|----------------|
@@ -221,7 +249,11 @@ Tests use an in-memory H2 database (configured in `src/test/resources/applicatio
 
 Integration tests use `@SpringBootTest` + `@AutoConfigureMockMvc` with a real Spring context, security filter chain, and H2 test database.
 
-**Total: 29 tests** (19 unit + 9 integration + 1 context load)
+### Current Status
+
+- Latest run result: **37 passed, 0 failed**
+- Test stack used: **JUnit 5, Mockito, SpringBootTest, MockMvc**
+- CI also executes tests in `.github/workflows/ci.yml`
 
 ---
 
@@ -283,8 +315,8 @@ All credentials are passed via environment variables from a `.env` file (see `.e
 page-carnival/
   src/main/java/com/pc/pc/
     config/           -- DataLoader (role seeding)
-    controller/       -- 8 controllers (REST API + MVC)
-    dto/              -- 8 Data Transfer Objects
+    controller/       -- REST API + MVC controllers (including seller order flow)
+    dto/              -- Data Transfer Objects
     exception/        -- Custom exceptions + global handlers
     model/            -- 5 JPA entities + enums
     repository/       -- 5 Spring Data JPA repositories
