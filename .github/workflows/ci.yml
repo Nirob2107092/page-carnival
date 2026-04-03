@@ -1,10 +1,11 @@
-name: Page Carnival CI
+name: Page Carnival CI/CD
 
 on:
   push:
     branches:
       - dev
       - feature/*
+      - main
   pull_request:
     branches:
       - dev
@@ -47,3 +48,12 @@ jobs:
           name: surefire-reports
           path: target/surefire-reports/
           retention-days: 7
+
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Render Deploy
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
