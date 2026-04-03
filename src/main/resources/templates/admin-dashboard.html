@@ -9,12 +9,25 @@
         .nav-links a { margin-left: 16px; color: #4a90d9; text-decoration: none; }
         .nav-links a:hover { text-decoration: underline; }
         h2 { color: #333; }
+        h3 { color: #333; margin-top: 30px; }
         .card-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 24px; }
         .card { flex: 1; min-width: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 24px; text-align: center; }
         .card h3 { margin: 0 0 10px; color: #333; }
         .card p { color: #777; margin: 0 0 16px; }
-        .btn { display: inline-block; padding: 8px 20px; background: #4a90d9; color: white; text-decoration: none; border-radius: 4px; }
+        .stat-value { font-size: 2em; font-weight: bold; color: #4a90d9; }
+        .btn { display: inline-block; padding: 8px 20px; background: #4a90d9; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; font-size: 0.9em; }
         .btn:hover { background: #357abd; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #27ae60; }
+        .btn-success:hover { background: #1e8449; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th { background: #f4f4f4; padding: 10px 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+        .status-enabled { color: #27ae60; font-weight: bold; }
+        .status-disabled { color: #e74c3c; font-weight: bold; }
+        .message { background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; }
         .logout-form { display: inline; }
         .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; padding: 0; }
         .logout-btn:hover { text-decoration: underline; }
@@ -24,6 +37,7 @@
     <nav>
         <span>Page Carnival — Admin</span>
         <div class="nav-links">
+            <a th:href="@{/admin/catalog}">Book Catalog</a>
             <form class="logout-form" th:action="@{/logout}" method="post">
                 <button class="logout-btn" type="submit">Logout</button>
             </form>
@@ -33,12 +47,54 @@
     <h2>Admin Dashboard</h2>
     <p>Welcome! You have full administrative access.</p>
 
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
     <div class="card-grid">
+        <div class="card">
+            <h3>Total Buyers</h3>
+            <p class="stat-value" th:text="${buyerCount}">0</p>
+        </div>
+        <div class="card">
+            <h3>Total Sellers</h3>
+            <p class="stat-value" th:text="${sellerCount}">0</p>
+        </div>
         <div class="card">
             <h3>Book Catalog</h3>
             <p>View all books listed on the platform.</p>
-            <a class="btn" th:href="@{/buyer/catalog}">View Catalog</a>
+            <a class="btn" th:href="@{/admin/catalog}">View Catalog</a>
         </div>
     </div>
+
+    <h3>Seller Management</h3>
+    <div th:if="${#lists.isEmpty(sellers)}">
+        <p style="color: #888;">No sellers registered yet.</p>
+    </div>
+    <table th:if="${!#lists.isEmpty(sellers)}">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="seller : ${sellers}">
+                <td th:text="${seller.fullName}"></td>
+                <td th:text="${seller.email}"></td>
+                <td>
+                    <span th:if="${seller.enabled}" class="status-enabled">Enabled</span>
+                    <span th:unless="${seller.enabled}" class="status-disabled">Disabled</span>
+                </td>
+                <td>
+                    <form th:action="@{/admin/sellers/{id}/toggle(id=${seller.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn"
+                                th:classappend="${seller.enabled} ? 'btn-danger' : 'btn-success'"
+                                th:text="${seller.enabled} ? 'Disable' : 'Enable'"></button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

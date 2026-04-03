@@ -1,5 +1,7 @@
 package com.pc.pc.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +24,7 @@ public class AuthController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new UserRegistrationDto());
-        model.addAttribute("roles", RoleType.values());
+        model.addAttribute("roles", List.of(RoleType.BUYER, RoleType.SELLER));
         return "register";
     }
 

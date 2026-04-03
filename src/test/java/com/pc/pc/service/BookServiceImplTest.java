@@ -78,11 +78,16 @@ class BookServiceImplTest {
     void getBookByIdShouldThrowWhenBookDoesNotExist() {
         when(bookRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> bookService.getBookById(99L));
+        ResourceNotFoundException ex =
+                assertThrows(ResourceNotFoundException.class, () -> bookService.getBookById(99L));
+        assertNotNull(ex);
     }
 
     @Test
     void updateBookShouldUpdateFieldsAndSave() {
+        User seller = new User();
+        seller.setEmail("seller@test.com");
+
         Book existing = new Book();
         existing.setTitle("Old");
         existing.setAuthor("Old");
@@ -90,11 +95,12 @@ class BookServiceImplTest {
         existing.setPrice(new BigDecimal("1.00"));
         existing.setStock(1);
         existing.setCategory("Old");
+        existing.setSeller(seller);
 
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(bookRepository.findByIdAndSeller(1L, seller)).thenReturn(Optional.of(existing));
         when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        BookDto updated = bookService.updateBook(1L, sampleDto);
+        BookDto updated = bookService.updateBookForSeller(1L, sampleDto, seller);
 
         assertEquals("Clean Code", updated.getTitle());
         assertEquals(10, updated.getStock());
@@ -103,18 +109,24 @@ class BookServiceImplTest {
 
     @Test
     void deleteBookShouldThrowWhenBookDoesNotExist() {
-        when(bookRepository.existsById(42L)).thenReturn(false);
+        User seller = new User();
+        when(bookRepository.findByIdAndSeller(42L, seller)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> bookService.deleteBook(42L));
-        verify(bookRepository, never()).deleteById(anyLong());
+        ResourceNotFoundException ex =
+                assertThrows(ResourceNotFoundException.class, () -> bookService.deleteBookForSeller(42L, seller));
+        assertNotNull(ex);
+        verify(bookRepository, never()).delete(any(Book.class));
     }
 
     @Test
     void deleteBookShouldDeleteWhenBookExists() {
-        when(bookRepository.existsById(5L)).thenReturn(true);
+        User seller = new User();
+        Book existing = new Book();
+        existing.setSeller(seller);
+        when(bookRepository.findByIdAndSeller(5L, seller)).thenReturn(Optional.of(existing));
 
-        bookService.deleteBook(5L);
+        bookService.deleteBookForSeller(5L, seller);
 
-        verify(bookRepository).deleteById(5L);
+        verify(bookRepository).delete(existing);
     }
 }
